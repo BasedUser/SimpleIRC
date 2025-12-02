@@ -44,7 +44,7 @@ public class ChatManager
     @Inject(at = @At("HEAD"), method = "sendChatMessage", cancellable = true)
     private void onSendChatMessage(String message, CallbackInfo info) 
     {
-    	
+
     	if(nickrequired)
     	{
     		nick = message;
@@ -189,7 +189,7 @@ public class ChatManager
         	}
         	else
         	{
-        		if (MainClient.irc!=null && MainClient.irc.isOpen() && String.valueOf(message.charAt(0)).equals(global))
+        		if (MainClient.irc!=null && MainClient.irc.isOpen() && String.valueOf(message.charAt(0)).equals(global) && message.length() > 1)
         		{
         			previusGlobal = message.substring(1, message.length());
         			ChatUtils.sudomessage(message.substring(1, message.length()));

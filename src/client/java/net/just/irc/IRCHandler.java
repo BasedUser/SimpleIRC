@@ -3,7 +3,8 @@ package net.just.irc;
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLSocket;
 
 public class IRCHandler 
 {
@@ -21,7 +22,7 @@ public class IRCHandler
     private BufferedWriter writer;
     private BufferedReader reader;
     
-    private Socket socket = null;
+    private SSLSocket socket = null;
     
     private boolean flag = true;
     
@@ -42,12 +43,17 @@ public class IRCHandler
 		new Thread(() -> {
 			try 
 			{
-				socket = new Socket(server, port);
-				
+				SSLSocketFactory sslFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+				socket = (SSLSocket) sslFactory.createSocket(server, port);
+            
+            	// Enable TLS protocols (modern ones)
+            	socket.setEnabledProtocols(new String[] {"TLSv1.2", "TLSv1.3"});
+            
+            	// Start handshake
+	            socket.startHandshake();
 				writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-				
 				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				
+
 				synchronized(processed) 
 			    {
 			    	login(writer);
@@ -55,14 +61,14 @@ public class IRCHandler
 				    ChatUtils.message("\u00A76waiting for the channel...");
 				    
 				    Listener();
-				    
 				    try {
 						processed.wait();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			        join("#" + channelname + " " + password);
+					ChatUtils.message("\u00A76joining " + channelname + " channel...");
+			        join(channelname + " " + password);
 			        
 			        try {
 	    				Thread.sleep(1000);
@@ -136,7 +142,7 @@ public class IRCHandler
                 		{
                 			String[] f1 = line.split(":");
                         	String[] f2 = f1[1].split("!");
-                        	String[] message = line.split("#"+channelname+" :");
+                        	String[] message = line.split(channelname+" :");
                         	
                         	ChatUtils.message("\u00A7c" + f2[0] + " \u00A7f>> " + message[1]);
                 		}
@@ -177,7 +183,7 @@ public class IRCHandler
 
     public void sendGroupMsg(String groupMsg) {
     	
-    	String channelname = "#" + this.channelname;
+    	String channelname = this.channelname;
     	
         try 
         {
