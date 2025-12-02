@@ -14,7 +14,7 @@ To connect to the server saved in the configuration file, type the "@connect" co
 
 ## Notes
 
-If you can't connect to your IRC channel, make sure no one has already joined with your Minecraft name on the IRC side. If this happened, use "@raw NICK <newnick>" and "@join <channel>".
+If you can't connect to your IRC channel, make sure no one has already joined with your Minecraft name on the IRC side. If this happened, use "@raw NICK <newnick>" and "@join &lt;channel&gt;".
 - This will also happen if you have a Minecraft name that starts with a number, you will NOT be able to connect with your Minecraft name. The technical reason is IRC reserves those for server IDs.
 
 If you enabled autoconnect, it'll connect in 10 seconds after entering a world.
