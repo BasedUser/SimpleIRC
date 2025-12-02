@@ -1,15 +1,16 @@
-package net.just.irc.mixin.client;
+package org.atmosia.simpleirc.mixin.client;
 
 import java.util.concurrent.TimeUnit;
+
+import org.atmosia.simpleirc.ChatUtils;
+import org.atmosia.simpleirc.Ircgroup;
+import org.atmosia.simpleirc.Main;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.just.irc.ChatUtils;
-import net.just.irc.Ircgroup;
-import net.just.irc.Main;
 import net.minecraft.client.network.ClientCommonNetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.listener.ClientPacketListener;

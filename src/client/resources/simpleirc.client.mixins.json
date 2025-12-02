@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "net.just.irc.mixin.client",
+	"package": "org.atmosia.simpleirc.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
 		"ChatManager",

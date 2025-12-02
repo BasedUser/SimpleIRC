@@ -1,25 +1,24 @@
-# Just IRC
+# Simple IRC
 
-Just IRC is a fabric mod that allows you to connect to an irc server in minecraft chat.
-
-This is my very first mod I create, so it kinda sucks. I hope to improve it over time!
+Simple IRC is a Fabric mod that allows you to connect to an IRC server in Minecraft. With it, you can fully interface with an IRC server (except for, with huge pain, services).
 
 ## Usage
-- You can interact with irc servers using game commands (the most thing you need to know can be found typing "@help" or "@h")
-- You can save irc informations through the config system which can be managed through the mod "modmenu" or through a keybind ("j" as default)
-- You can connect or disconnect the channel using a keybind ("k" as default)
 
-### When you want to connect to the server saved in the configuration file, you have to type the "@connect" command without any additional parameters.
+- You can interact with an IRC server using game commands (use "@help" for a list of commands).
+- You can save IRC connection info through the config system using either the "modmenu" mod, or a keybind (default: "J").
+- You can toggle your IRC connection with a keybind (default: "K").
 
-<a href="https://github.com/8bitFra/JustIRC"><img src="https://raw.githubusercontent.com/8bitFra/JustIRC/ver/1.20.2/images/help.png" title="help" alt="help" width="545" height="214"></a>
+To connect to the server saved in the configuration file, type the "@connect" command without any additional parameters.
 
+### Tested on Pissnet (UnrealIRCd, no services).
 
-### Tested on irc.libera.chat and a local server created with InspIRCd
+## Notes
 
-### Useful informations
-If you can't connect to the irc channel, make sure no one has already joined with your minecraft name.
+If you can't connect to your IRC channel, make sure no one has already joined with your Minecraft name on the IRC side. If this happened, use "@raw NICK <newnick>" and "@join <channel>".
+- This will also happen if you have a Minecraft name that starts with a number, you will NOT be able to connect with your Minecraft name. The technical reason is IRC reserves those for server IDs.
 
-If you have a Minecraft name that start with a number, if you can't connect to the irc server, make sure that you haven't used illegal characters on your irc nickname. (currently in this case the mod has no checks)
+If you enabled autoconnect, it'll connect in 10 seconds after entering a world.
 
-If you are using the auto connect option, it will start about 10 seconds after entering a world.
+## Attribution
 
+This mod is a fork of [JustIRC](https://github.com/8bitFra/JustIRC). I made this because I was personally annoyed with how little features it had - namely default chat setting. (Just like the original author, this is my first modding experience.)

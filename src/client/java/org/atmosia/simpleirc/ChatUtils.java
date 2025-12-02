@@ -1,15 +1,13 @@
-package net.just.irc;
+package org.atmosia.simpleirc;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.Text;
-public enum ChatUtils
-{
-	;
+
+public enum ChatUtils{
+	; // <-- WHAT THE FUCK?????
 	
 	private static final MinecraftClient MCInstance = MinecraftClient.getInstance();
-
-	
 
 	public static void component(Text component)
 	{

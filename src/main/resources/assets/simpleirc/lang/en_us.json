@@ -1,0 +1,11 @@
+{
+	"text.autoconfig.simpleirc.option.ip": "IP",
+	"text.autoconfig.simpleirc.option.backupnick": "Backup Nickname",
+	"text.autoconfig.simpleirc.option.channel": "Channel",
+	"text.autoconfig.simpleirc.option.password": "Channel Password",
+	"text.autoconfig.simpleirc.option.port": "Port",
+	"text.autoconfig.simpleirc.option.autoconnect": "Auto-connect",
+	"key.simpleirc.config": "Config GUI",
+	"key.simpleirc.toggleconnect": "Connect/Disconnect",
+	"category.simpleirc.main": "Simple IRC"
+}

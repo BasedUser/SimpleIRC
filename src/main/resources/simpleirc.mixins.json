@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "net.just.irc.mixin",
+	"package": "org.atmosia.simpleirc.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
 	],

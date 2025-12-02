@@ -1,37 +1,38 @@
 {
   "schemaVersion": 1,
-  "id": "justirc",
+  "id": "simpleirc",
   "version": "${version}",
 
-  "name": "Just Irc",
-  "description": "A minecraft IRC client mod!",
+  "name": "Simple IRC",
+  "description": "A mediocre IRC client for Minecraft.",
   "authors": [
+    "BasedUser",
     "8bitFra"
   ],
   "contact": {
-    "homepage": "https://github.com/8bitFra/JustIRC",
-    "sources": "https://github.com/8bitFra/JustIRC"
+    "homepage": "https://baseduser.eu.org",
+    "sources": "https://github.com/BasedUser/SimpleIRC"
   },
 
-  "license": "MIT License",
-  "icon": "assets/justirc/icon.png",
+  "license": "MIT",
+  "icon": "assets/simpleirc/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.just.irc.Main"
+      "org.atmosia.simpleirc.Main"
     ],
     "client": [
-      "net.just.irc.MainClient"
+      "org.atmosia.simpleirc.MainClient"
     ],
     "modmenu":[
-		"net.just.irc.ModMenuIntegration"
+		"org.atmosia.simpleirc.ModMenuIntegration"
 	]
   },
   "mixins": [
-    "justirc.mixins.json",
+    "simpleirc.mixins.json",
     {
-		"config": "justirc.client.mixins.json",
+		"config": "simpleirc.client.mixins.json",
 		"environment": "client"
 	}
   ],
@@ -43,6 +44,7 @@
     "java": ">=17"
   },
   "suggests": {
-    "another-mod": "*"
+    "another-mod": "cloth-config",
+	"minecraft": "1.21.8"
   }
 }

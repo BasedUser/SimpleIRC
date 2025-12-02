@@ -1,27 +1,20 @@
-package net.just.irc;
+package org.atmosia.simpleirc;
 
-import me.lortseam.completeconfig.api.ConfigEntries;
-import me.lortseam.completeconfig.api.ConfigEntry;
-import me.lortseam.completeconfig.api.ConfigGroup;
-import me.lortseam.completeconfig.data.Config;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
-@ConfigEntries(includeAll = true)
-public class Ircgroup extends Config implements ConfigGroup
-{
-	
+@Config(name = "simpleirc")
+public class Ircgroup implements ConfigData {
 	private static String ip = "";
     private static String backupnick = "";
     private static String channel = "";
     private static String password = "";
-    private static Integer port = 6667;
-    @ConfigEntry(requiresRestart = true)
+    private static Integer port = 6697;
+    @ConfigEntry.Gui.RequiresRestart(value = true)
     private static boolean autoconnect;
-    
-    public Ircgroup()
-    {
-    	super(Main.MOD_ID);
-    }
-    
+
 	public static String getIp() {
 		return ip;
 	}
