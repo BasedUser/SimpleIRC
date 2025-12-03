@@ -1,9 +1,7 @@
 package org.atmosia.simpleirc;
 
-import org.atmosia.simpleirc.Ircgroup;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
-
 import net.fabricmc.api.ModInitializer;
 
 public class Main implements ModInitializer {
@@ -25,7 +23,7 @@ public class Main implements ModInitializer {
 		AutoConfig.register(Ircgroup.class, JanksonConfigSerializer::new);
     	System.out.println("Simple IRC has started.");
 
-    	settings =  AutoConfig.getConfigHolder(Ircgroup.class).getConfig();
+    	settings = AutoConfig.getConfigHolder(Ircgroup.class).getConfig();
         
     }	
 }

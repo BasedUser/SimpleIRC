@@ -9,14 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.SSLSocket;
 
-public class IRCHandler {
-    public enum IrcVerbosity {
-        QUIET,   // only messages + events that affect us directly
-        NORMAL,  // QUIET + channel meta, but not other users' join/part/quit/nick
-        VERBOSE, // everything for everyone in channels
-        RAW      // VERBOSE + raw incoming/outgoing lines
-    }
 
+public class IRCHandler {
     private String server = "";
     private String nick = "";
     // Default target (channel or nick) when no prefix is used

@@ -1,16 +1,11 @@
 package org.atmosia.simpleirc.mixin.client;
 
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-
 import java.util.StringTokenizer;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.atmosia.simpleirc.ChatUtils;
-import org.atmosia.simpleirc.IRCHandler;
-import org.atmosia.simpleirc.Main;
-import org.atmosia.simpleirc.MainClient;
-import org.atmosia.simpleirc.Ircgroup;
+import org.atmosia.simpleirc.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -39,7 +34,7 @@ public class ChatManager {
     private Map<Character, String> channelBindings = new HashMap<Character, String>();
 
     // desired verbosity (applied to new IRCHandler instances)
-    private IRCHandler.IrcVerbosity pendingVerbosity = IRCHandler.IrcVerbosity.NORMAL;
+    private IrcVerbosity pendingVerbosity = IrcVerbosity.NORMAL;
     
     
     private String help = "\n\n\u00A7cHELP \u00A7f\n\n"
@@ -236,7 +231,7 @@ public class ChatManager {
     private void handleConnect(String message) {
         if(message.equals(prefix + "connect"))
         {
-            if(!"".equals(Ircgroup.getIp()) && !"".equals(Ircgroup.getChannel()) && !"".equals(Ircgroup.getBackupnick()) && !"".equals(Ircgroup.getChannel()))
+            if(!"".equals(Main.getSettings().ip) && !"".equals(Main.getSettings().channel) && !"".equals(Main.getSettings().backupnick))
             {
                 if(MainClient.irc != null && MainClient.irc.getSocket()!=null)
                 {
@@ -245,17 +240,16 @@ public class ChatManager {
                         MainClient.irc.closeConnection();
                     }    
                 }
-                
+                ip = Main.getSettings().ip;
                 nick = ChatUtils.getUsername();
-                
-				channel = Ircgroup.getChannel();
-				port = Ircgroup.getPort();
-				password = Ircgroup.getPassword();
+				channel = Main.getSettings().channel;
+				port = Main.getSettings().port;
+				password = Main.getSettings().password;
 				
                 if(Character.isDigit(nick.charAt(0)))
-                    nick = Ircgroup.getBackupnick();
+                    nick = Main.getSettings().backupnick;
                 
-                MainClient.irc = new IRCHandler(Ircgroup.getIp(),nick,Ircgroup.getChannel(),Ircgroup.getPassword(),Ircgroup.getPort());
+                MainClient.irc = new IRCHandler(ip, nick, channel, password, port);
 				MainClient.irc.setVerbosity(pendingVerbosity);
 				MainClient.irc.startConn();
             }
@@ -299,7 +293,7 @@ public class ChatManager {
                     password = fields[3];
                 }
                 
-                if(port>=65536)
+                if(port>=65536 || port < 1)
                 {
                     ChatUtils.message("\u00A7cError: port must be valid, falling back to default (6697).");
                     port = 6697;
@@ -439,7 +433,7 @@ public class ChatManager {
 
         String level = parts[1].trim().toUpperCase();
         try {
-            IRCHandler.IrcVerbosity v = IRCHandler.IrcVerbosity.valueOf(level);
+            IrcVerbosity v = IrcVerbosity.valueOf(level);
             pendingVerbosity = v;
             if (MainClient.irc != null) {
                 MainClient.irc.setVerbosity(v);

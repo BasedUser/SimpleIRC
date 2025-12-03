@@ -6,6 +6,8 @@ import net.minecraft.text.Text;
 
 public enum ChatUtils{
 	; // <-- WHAT THE FUCK?????
+    // I just tried to remove it and got 34 compilation errors.
+    // I cannot describe my fucking confusion - FJSAGS
 	
 	private static final MinecraftClient MCInstance = MinecraftClient.getInstance();
 
