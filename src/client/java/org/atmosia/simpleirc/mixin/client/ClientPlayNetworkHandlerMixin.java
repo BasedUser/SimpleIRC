@@ -3,7 +3,6 @@ package org.atmosia.simpleirc.mixin.client;
 import java.util.concurrent.TimeUnit;
 
 import org.atmosia.simpleirc.ChatUtils;
-import org.atmosia.simpleirc.Ircgroup;
 import org.atmosia.simpleirc.Main;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,12 +36,12 @@ public abstract class ClientPlayNetworkHandlerMixin implements ClientPacketListe
 			new Thread(() -> 
 			{
 				try {
-					TimeUnit.SECONDS.sleep(10);
+					TimeUnit.SECONDS.sleep(5);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if(Ircgroup.isAutoconnect())
+				if(Main.getSettings().autoconnect)
 				{
 					ChatUtils.sudomessage("@connect");
 				}
