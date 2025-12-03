@@ -36,7 +36,7 @@ public abstract class ClientPlayNetworkHandlerMixin implements ClientPacketListe
 			new Thread(() -> 
 			{
 				try {
-					TimeUnit.SECONDS.sleep(1);
+					TimeUnit.SECONDS.sleep(5);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
