@@ -1,0 +1,50 @@
+package org.atmosia.simpleirc.commands.subcommands;
+
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.sun.jdi.connect.Connector;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.text.Text;
+import org.atmosia.simpleirc.ChatUtils;
+import org.atmosia.simpleirc.Main;
+import org.atmosia.simpleirc.MainClient;
+import org.atmosia.simpleirc.classes.IRCNetwork;
+
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+
+public class ConnectCommand {
+    public static LiteralArgumentBuilder<FabricClientCommandSource> Register(LiteralArgumentBuilder<FabricClientCommandSource> command) {
+        command.then(ClientCommandManager.literal("connect").executes(ConnectCommand::Connect)
+                .then(argument("server_ip", StringArgumentType.string())
+                        .then(argument("server_port", IntegerArgumentType.integer(0, 65535))
+                                .then(argument("channel", StringArgumentType.string())
+                                        .then(argument("password", StringArgumentType.string())
+                                                .executes(ConnectCommand::ConnectWithArgs))
+                                )
+                        )
+                )
+        );
+        return command;
+    }
+
+    private static int ConnectWithArgs(CommandContext<FabricClientCommandSource> ctx) {
+        var server = ctx.getArgument("server_ip", String.class);
+        var serverPort = ctx.getArgument("server_port", Integer.class);
+        var channel = ctx.getArgument("channel", String.class);
+        var password = ctx.getArgument("password", String.class);
+
+        MainClient.irc = new IRCNetwork(server, serverPort, channel, password, Main.getSettings().verbosity);
+        MainClient.irc.Connect();
+        return 0;
+    }
+
+
+    private static int Connect(CommandContext<FabricClientCommandSource> ctx) {
+        ctx.getSource().sendFeedback(Text.literal("Invoked /simpleirc connect"));
+        MainClient.Connect();
+        return 0;
+    }
+}

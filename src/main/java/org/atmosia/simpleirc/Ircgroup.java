@@ -13,4 +13,6 @@ public class Ircgroup implements ConfigData {
     public Integer port = 6697;
     @ConfigEntry.Gui.RequiresRestart()
     public boolean autoconnect;
+    @ConfigEntry.Gui.Excluded()
+    public IrcVerbosity verbosity = IrcVerbosity.NORMAL;
 }

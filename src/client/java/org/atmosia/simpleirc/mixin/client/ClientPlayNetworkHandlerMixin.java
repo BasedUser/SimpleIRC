@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.atmosia.simpleirc.ChatUtils;
 import org.atmosia.simpleirc.Main;
 
+import org.atmosia.simpleirc.MainClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -43,7 +44,7 @@ public abstract class ClientPlayNetworkHandlerMixin implements ClientPacketListe
 				}
 				if(Main.getSettings().autoconnect)
 				{
-					ChatUtils.sudomessage("@connect");
+                    MainClient.Connect();
 				}
 			}).start();
 		}

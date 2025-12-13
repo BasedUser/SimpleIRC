@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.SSLSocket;
-
-
+// THIS is going to be a monument that will show what AI can do
+// But also it will show, how unexpandable the code became because of AI usage.
+/*
 public class IRCHandler {
     private String server = "";
     private String nick = "";
@@ -66,9 +67,9 @@ public class IRCHandler {
 
                 synchronized(processed) 
                 {
-                    ChatUtils.message("\u00A7aConnected to " + server + " successfully");
+                    ChatUtils.message("§aConnected to " + server + " successfully");
                     login(writer);
-                    ChatUtils.message("\u00A76Waiting for handshake...");
+                    ChatUtils.message("§6Waiting for handshake...");
 
                     Listener();
                     try {
@@ -76,25 +77,26 @@ public class IRCHandler {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    ChatUtils.message("\u00A76Joining channel " + channelname + "...");
+                    ChatUtils.message("§6Joining channel " + channelname + "...");
                     join(channelname + " " + password);
 
                     try {
                         Thread.sleep(1000); // yeah. cry about it.
+                        // I will, and I am rewriting your vibecode.
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
                     if(isOpen())
                     {
-                        ChatUtils.message("\u00A7e[\u00A7aDONE\u00A7e]");
+                        ChatUtils.message("§e[§aDONE§e]");
                     }
                 }
 
             } catch (Exception e) 
             {
                 e.printStackTrace();
-                ChatUtils.message("\u00A7cCould not connect to " + server + ":" + port);
+                ChatUtils.message("§cCould not connect to " + server + ":" + port);
             }
         }).start();
     }
@@ -107,7 +109,7 @@ public class IRCHandler {
                 while ((line = reader.readLine()) != null) {
 
                     if (verbosity == IrcVerbosity.RAW) {
-                        ChatUtils.message("\u00A78[raw <=]\u00A77 " + line);
+                        ChatUtils.message("§8[raw <=]§7 " + line);
                     }
 
                     handleLine(line);
@@ -127,7 +129,7 @@ public class IRCHandler {
 
         // crude join failure catch
         if (line.toLowerCase().contains("cannot join channel")) {
-            ChatUtils.message("\u00A7cCannot join channel (are you banned, or is the password correct?)");
+            ChatUtils.message("§cCannot join channel (are you banned, or is the password correct?)");
             closeConnection();
             return;
         }
@@ -201,11 +203,11 @@ public class IRCHandler {
             String formattedNick = formatNick(bareNick, displayTarget);
 
             StringBuilder sb = new StringBuilder();
-            sb.append("\u00A79").append(displayTarget).append("\u00A7r").append(" | ");
+            sb.append("§9").append(displayTarget).append("§r").append(" | ");
             if ("NOTICE".equals(command)) {
-                sb.append("\u00A76[NOTICE]\u00A7r ");
+                sb.append("§6[NOTICE]§r ");
             }
-            sb.append("<").append(formattedNick).append("\u00A7r> ").append(trailing);
+            sb.append("<").append(formattedNick).append("§r> ").append(trailing);
 
             ChatUtils.message(sb.toString());
             return;
@@ -228,7 +230,7 @@ public class IRCHandler {
             }
 
             String formattedNick = formatNick(bareNick, chan);
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | + " + formattedNick);
+            ChatUtils.message("§9" + chan + "§r | + " + formattedNick);
             return;
         }
 
@@ -244,8 +246,8 @@ public class IRCHandler {
             }
 
             String formattedNick = formatNick(bareNick, chan);
-            String reason = trailing.isEmpty() ? "" : " \u00A77(" + trailing + "\u00A77)";
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | - " + formattedNick + reason);
+            String reason = trailing.isEmpty() ? "" : " §7(" + trailing + "§7)";
+            ChatUtils.message("§9" + chan + "§r | - " + formattedNick + reason);
             return;
         }
 
@@ -263,8 +265,8 @@ public class IRCHandler {
             }
 
             String formattedNick = formatNick(bareNick, chan);
-            String reason = trailing.isEmpty() ? "" : " \u00A77(" + trailing + "\u00A77)";
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | - " + formattedNick + " \u00A7cquit" + reason);
+            String reason = trailing.isEmpty() ? "" : " §7(" + trailing + "§7)";
+            ChatUtils.message("§9" + chan + "§r | - " + formattedNick + " §cquit" + reason);
             return;
         }
 
@@ -295,9 +297,9 @@ public class IRCHandler {
                 return;
             }
 
-            String oldColor = "\u00A7c" + bareNick;
-            String newColor = "\u00A7c" + newNick;
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | \u00A7enick\u00A7r: " + oldColor + " \u00A7e->\u00A7r " + newColor);
+            String oldColor = "§c" + bareNick;
+            String newColor = "§c" + newNick;
+            ChatUtils.message("§9" + chan + "§r | §enick§r: " + oldColor + " §e->§r " + newColor);
 
             if (bareNick.equalsIgnoreCase(this.nick)) {
                 this.nick = newNick;
@@ -320,7 +322,7 @@ public class IRCHandler {
 
             String kicker = formatNick(bareNick, chan);
             String reason = trailing.isEmpty() ? "" : ": " + trailing;
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | - \u00A7c" + victim + "\u00A7r (kicked by " + kicker + reason + ")");
+            ChatUtils.message("§9" + chan + "§r | - §c" + victim + "§r (kicked by " + kicker + reason + ")");
             return;
         }
 
@@ -339,7 +341,7 @@ public class IRCHandler {
                 return;
             }
 
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | " + inviter + " \u00A76invited\u00A7r " + targetNick + " \u00A7rto the channel");
+            ChatUtils.message("§9" + chan + "§r | " + inviter + " §6invited§r " + targetNick + " §rto the channel");
             return;
         }
 
@@ -349,7 +351,7 @@ public class IRCHandler {
             String chan = middleParts[1];
             String setter = formatNick(bareNick, chan);
 
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | \u00A76Topic\u00A7r: " + trailing + " \u00A77(by " + setter + "\u00A77)");
+            ChatUtils.message("§9" + chan + "§r | §6Topic§r: " + trailing + " §7(by " + setter + "§7)");
             return;
         }
 
@@ -411,7 +413,7 @@ public class IRCHandler {
                     params.append(trailing);
                 }
 
-                ChatUtils.message("\u00A79" + target + "\u00A7r | " + actor + " \u00A76set modes\u00A7r " + params + " \u00A76on " + target);
+                ChatUtils.message("§9" + target + "§r | " + actor + " §6set modes§r " + params + " §6on " + target);
                 return;
             }
         }
@@ -448,7 +450,7 @@ public class IRCHandler {
         // 332: topic
         if ("332".equals(command) && middleParts.length >= 3) {
             String chan = middleParts[2];
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | \u00A76Topic\u00A7r: " + trailing);
+            ChatUtils.message("§9" + chan + "§r | §6Topic§r: " + trailing);
             return;
         }
 
@@ -456,7 +458,7 @@ public class IRCHandler {
         if ("333".equals(command) && middleParts.length >= 5) {
             String chan = middleParts[2];
             String setter = middleParts[3];
-            ChatUtils.message("\u00A79" + chan + "\u00A7r | \u00A76Topic set by\u00A7r " + setter);
+            ChatUtils.message("§9" + chan + "§r | §6Topic set by§r " + setter);
             return;
         }
 
@@ -465,7 +467,7 @@ public class IRCHandler {
         if ("401".equals(command) && middleParts.length >= 3) {
             String target = middleParts[2];
             String msg = trailing.isEmpty() ? "No such nick/channel" : trailing;
-            ChatUtils.message("\u00A7cNo such nick/channel: \u00A7e" + target + "\u00A7c - " + msg);
+            ChatUtils.message("§cNo such nick/channel: §e" + target + "§c - " + msg);
             return;
         }
 		
@@ -474,7 +476,7 @@ public class IRCHandler {
         if ("404".equals(command) && middleParts.length >= 3) {
             String target = middleParts[2];
             String msg = trailing.isEmpty() ? "No external channel messages" : trailing;
-            ChatUtils.message("\u00A7cYou're not in channel \u00A7e" + target + "\u00A7c: " + msg);
+            ChatUtils.message("§cYou're not in channel §e" + target + "§c: " + msg);
             return;
         }
     }
@@ -573,15 +575,15 @@ public class IRCHandler {
         String statusColor = null;
         if (status != 0) {
             switch (status) {
-                case '+': statusColor = "\u00A7b"; break; // aqua
-                case '%': statusColor = "\u00A71"; break; // dark blue
-                case '@': statusColor = "\u00A7a"; break; // green
-                case '&': statusColor = "\u00A76"; break; // gold
-                case '~': statusColor = "\u00A7e"; break; // yellow
+                case '+': statusColor = "§b"; break; // aqua
+                case '%': statusColor = "§1"; break; // dark blue
+                case '@': statusColor = "§a"; break; // green
+                case '&': statusColor = "§6"; break; // gold
+                case '~': statusColor = "§e"; break; // yellow
             }
         }
 
-        String nickColor = "\u00A7c";
+        String nickColor = "§c";
 
         StringBuilder sb = new StringBuilder();
         if (statusColor != null) {
@@ -609,7 +611,7 @@ public class IRCHandler {
         }
         if (verbosity == IrcVerbosity.RAW) {
             // sent lines as fully yellow
-            ChatUtils.message("\u00A7e[raw =>] " + line);
+            ChatUtils.message("§e[raw =>] " + line);
         }
         writer.write(line + "\r\n");
         writer.flush();
@@ -620,7 +622,7 @@ public class IRCHandler {
             writeLine("JOIN " + channelname);
         } catch (IOException e) {
             System.err.println("Join error: " + e.getMessage());
-            ChatUtils.message("\u00A7cCould not join channel "+channelname);
+            ChatUtils.message("§cCould not join channel "+channelname);
             login(writer);
         }
     }
@@ -635,7 +637,7 @@ public class IRCHandler {
             writeLine("USER " + nick + " mc * : " + nick);
         } catch (IOException e) {
             System.err.println("login error " + e.getMessage());
-            ChatUtils.message("\u00A7cCould not set identity: " + e.getMessage());
+            ChatUtils.message("§cCould not set identity: " + e.getMessage());
             closeConnection();
         }
     }
@@ -720,3 +722,4 @@ public class IRCHandler {
         return formatNick(bareNick, channel);
     }
 }
+ */

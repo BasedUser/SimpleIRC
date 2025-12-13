@@ -1,21 +1,22 @@
 package org.atmosia.simpleirc;
 
+import org.atmosia.simpleirc.classes.IRCNetwork;
+import org.atmosia.simpleirc.commands.SimpleIrcCommand;
 import org.lwjgl.glfw.GLFW;
 
-import me.lortseam.completeconfig.gui.ConfigScreenBuilder;
-import me.lortseam.completeconfig.gui.cloth.ClothConfigScreenBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import org.atmosia.simpleirc.ModMenuIntegration;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
-public class MainClient implements ClientModInitializer {	
-	public static IRCHandler irc = null;
+import java.util.Objects;
 
+public class MainClient implements ClientModInitializer {	
+	public static IRCNetwork irc = null;
+    public static Boolean DefaultToMinecraftChat = false;
 	private static KeyBinding JBind = KeyBindingHelper.registerKeyBinding(new KeyBinding(
     	    "key.simpleirc.config", // The translation key of the keybinding's name
     	    InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
@@ -53,17 +54,30 @@ public class MainClient implements ClientModInitializer {
             
             while(KBind.wasPressed())
             {
-            	if(irc==null || !irc.isOpen())
+            	if(irc==null || !irc.isConnected())
             	{
-            		ChatUtils.sudomessage("@connect");
+            		Connect();
             	}
             	else
             	{
-            		ChatUtils.sudomessage("@disconnect");
+            		Disconnect("Disconnected via command");
             	}
             }
         });
-		
+        SimpleIrcCommand.Register();
 	}
+    public static void Connect() {
+        ChatUtils.Info("Invoked MainClient.Connect()");
+        MainClient.irc = new IRCNetwork(Main.getSettings().ip, Main.getSettings().port, ChatUtils.getUsername(),
+                Main.getSettings().backupnick, Main.getSettings().verbosity);
+        ChatUtils.Info("Created IRCNetwork");
+        MainClient.irc.Connect();
+    }
+    public static void Disconnect(String reason) {
+        if (Objects.equals(reason, "")) {
+            reason = "Leaving";
+        }
+        MainClient.irc.Disconnect(reason);
+    }
 
 }

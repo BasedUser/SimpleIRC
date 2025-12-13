@@ -24,6 +24,5 @@ public class Main implements ModInitializer {
     	System.out.println("Simple IRC has started.");
 
     	settings = AutoConfig.getConfigHolder(Ircgroup.class).getConfig();
-        
     }	
 }
