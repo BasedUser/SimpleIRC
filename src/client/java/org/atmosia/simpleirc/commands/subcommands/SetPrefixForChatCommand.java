@@ -65,7 +65,7 @@ public class SetPrefixForChatCommand {
             MainClient.DefaultToMinecraftChat = false;
             MainClient.irc.SetPrimaryChannel(channel);
         }
-        ChatUtils.Notify("Set channel §7" + channel + "§r as the primary channel.");
+        ChatUtils.Notify("Set channel <gray>" + channel + "</gray> as the primary channel.");
         return 0;
     }
 }

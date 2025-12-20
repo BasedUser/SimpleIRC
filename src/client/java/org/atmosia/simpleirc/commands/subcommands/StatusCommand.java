@@ -5,6 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.atmosia.simpleirc.ChatUtils;
 import org.atmosia.simpleirc.MainClient;
 
@@ -16,7 +18,10 @@ public class StatusCommand {
     public static int Status(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
         if(MainClient.irc!=null && MainClient.irc.isConnected())
         {
-            ChatUtils.message("§aConnected to server: §e" + MainClient.irc.ip() + "§a, channels: §e" + MainClient.irc.channels());
+            Component message = MiniMessage.miniMessage().deserialize(
+                    "<green>Connected to server:</green> <yellow>" + MainClient.irc.ip() + "</yellow><green>, channels: <yellow> " + MainClient.irc.channels()
+            );
+            ChatUtils.message(message);
             // TODO: refactor to not use ChatUtils.message(). Maybe .info()?
         }
         else

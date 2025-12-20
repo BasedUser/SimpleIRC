@@ -27,12 +27,12 @@ public class SimpleIrcCommand {
     private static void RegisterForReal(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
         var command = ClientCommandManager.literal("simpleirc").executes(SimpleIrcCommand::SendHelp)
                 .then(ClientCommandManager.literal("help").executes(SimpleIrcCommand::SendHelp));
-        command = ConfigCommand.Register(command);
-        command = ConnectCommand.Register(command);
-        command = DisconnectCommand.Register(command);
-        command = StatusCommand.Register(command);
-        command = IRCBasicCommands.Register(command);
-        command = SetPrefixForChatCommand.Register(command);
+        ConfigCommand.Register(command);
+        ConnectCommand.Register(command);
+        DisconnectCommand.Register(command);
+        StatusCommand.Register(command);
+        IRCBasicCommands.Register(command);
+        SetPrefixForChatCommand.Register(command);
         dispatcher.register(command);
     }
     private static int SendHelp(CommandContext<FabricClientCommandSource> ctx) {

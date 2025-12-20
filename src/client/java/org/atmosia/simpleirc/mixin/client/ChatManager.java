@@ -8,43 +8,57 @@ import java.util.Map;
 import org.atmosia.simpleirc.*;
 import org.atmosia.simpleirc.classes.IRCNetwork;
 import org.atmosia.simpleirc.classes.MessageHandler;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Debug;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ChatManager {
-    
-    
+
+
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+
     @Inject(at = @At("HEAD"), method = "sendChatMessage", cancellable = true)
     private void onSendChatMessage(String message, CallbackInfo info) 
     {
         if (message == null) {
             return;
         }
-        var channel = MainClient.irc.GetChannelByPrefix(message.charAt(0));
-        if (MainClient.DefaultToMinecraftChat || message.charAt(0) == '!') {
-            // just do nothing, else ifs get skipped.
-            message = message.substring(1);
+        boolean skipIrcStuff = MainClient.irc == null || MainClient.DefaultToMinecraftChat || message.charAt(0) == '!';
+        if (skipIrcStuff) {
+            Main.LOGGER.info("Sent message to normal chat, since one condition isn't satisfied");
         }
-        else if (channel != null) {
-            String text = message.substring(1);
-            MainClient.irc.SendMessage(channel.Name, text);
-            String selfNick = MainClient.irc.nickname();
-            ChatUtils.IRCMessageTemplates.Message(selfNick, channel.Name, text);
-            info.cancel();
+        else {
+            Main.LOGGER.info("Sending message to IRC chat");
+            var channel = MainClient.irc.GetChannelByPrefix(message.charAt(0));
+            if (channel != null) {
+                String text = message.substring(1);
+                MainClient.irc.SendMessage(channel.Name, text);
+                String selfNick = MainClient.irc.nickname();
+                ChatUtils.IRCMessageTemplates.Message(selfNick, channel.Name, text);
+                info.cancel();
+            }
+            else if (MainClient.irc != null && MainClient.irc.isConnected()
+                    && !MainClient.DefaultToMinecraftChat
+                    && !String.valueOf(message.charAt(0)).equals("/")
+                    && !MainClient.irc.channels().isEmpty()) {
+                MainClient.irc.SendMessage("", message);
+                String currentChannel = MainClient.irc.GetPrimaryChannel();
+                String selfNick = MainClient.irc.nickname();
+                ChatUtils.IRCMessageTemplates.Message(selfNick, currentChannel, message);
+                info.cancel();
+            }
         }
-        else if (MainClient.irc != null && MainClient.irc.isConnected()
-            && !MainClient.DefaultToMinecraftChat
-            && !String.valueOf(message.charAt(0)).equals("/")) {
-            MainClient.irc.SendMessage("", message);
-            String currentChannel = MainClient.irc.GetPrimaryChannel();
-            String selfNick = MainClient.irc.nickname();
-            ChatUtils.IRCMessageTemplates.Message(selfNick, currentChannel, message);
-            info.cancel();
-        }
-			// Normal chat / IRC bridging
+
+
+        // Normal chat / IRC bridging
 
 			// Bound prefix to specific channel
 //			if (MainClient.irc != null && MainClient.irc.isConnected() && message.length() > 0) {

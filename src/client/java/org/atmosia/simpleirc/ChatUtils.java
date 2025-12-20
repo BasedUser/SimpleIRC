@@ -1,10 +1,15 @@
 package org.atmosia.simpleirc;
 
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.atmosia.simpleirc.classes.MessageHandler;
-
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import java.awt.*;
 import java.util.Map;
 
 public enum ChatUtils{
@@ -13,23 +18,17 @@ public enum ChatUtils{
     // I cannot describe my fucking confusion - FJSAGS
 	
 	private static final MinecraftClient MCInstance = MinecraftClient.getInstance();
-
+    private static MiniMessage mm = MiniMessage.miniMessage();
 	public static void component(Text component)
 	{
 		ChatHud chatHud = MCInstance.inGameHud.getChatHud();
 		chatHud.addMessage(component);
 	}
 	
-	public static void message(String message)
+	public static void message(Component message)
 	{
-		component (Text.literal(message));
-	}
-	
-	public static void sudomessage(String message)
-	{
-		//MC.player.sendChatMessage(message, null);
-		MCInstance.getNetworkHandler().sendChatMessage(message);
-		
+		Audience player = MCInstance.player;
+        player.sendMessage(message);
 	}
 	
 	public static String getUsername()
@@ -38,97 +37,84 @@ public enum ChatUtils{
 	}
 
     public static void Error(Exception e) {
-        var message = e.getMessage().replace("§r", "§c"); // to allow custom formatting mid-sentence;
-        message("§c[ERR] " + message);
+        Component parsedMsg = mm.deserialize("<red>[ERR] " + e.getMessage() + "</red>");
+        message(parsedMsg);
     }
     public static void Error(String message) {
-        message = message.replace("§r", "§c"); // to allow custom formatting mid-sentence;
-        message("§c[ERR] " + message);
+        Component parsedMsg = mm.deserialize("<red>[ERR] " + message + "</red>");
+        message(parsedMsg);
     }
     public static void Info(String message) {
-        message = message.replace("§r", "§7");
-        message("§7[INFO] " + message);
+        Component parsedMsg = mm.deserialize("<gray>[INFO] " + message + "</gray>");
+        message(parsedMsg);
     }
     public static void Warn(String message) {
-        message = message.replace("§r", "§e");
-        message("§e" + message);
+        Component parsedMsg = mm.deserialize("<yellow>[WARN] " + message + "</yellow>");
+        message(parsedMsg);
     }
     public static void RawOut(String message) {
         if (MainClient.irc.Verbosity != IrcVerbosity.RAW) return;
-        message = message.replace("§r", "§e");
-        message("§e[RAW =>] " + message);
+        Component parsedMsg = mm.deserialize("<yellow>[RAW =>] " + message + "</yellow>");
+        message(parsedMsg);
     }
     public static void RawIn(String message) {
         if (MainClient.irc.Verbosity != IrcVerbosity.RAW) return;
-        message = message.replace("§r", "§8");
-        message("§7[RAW <=] " + message);
+        Component parsedMsg = mm.deserialize("<dark_gray>[RAW <=]</dark_gray> <gray>" + message + "</gray>");
+        message(parsedMsg);
     }
     public static void Success(String message) {
-        message = message.replace("§r", "§a");
-        message("§a[SUCCESS] " + message);
+        Component parsedMsg = mm.deserialize("<green>[INFO] " + message + "</green>");
+        message(parsedMsg);
     }
     public static void Notify(String message) {
-        message = message.replace("§r", "§9");
-        message("§a[INFO] §9" + message);
+        Component parsedMsg = mm.deserialize("<blue>[INFO] " + message + "</blue>");
+        message(parsedMsg);
 
     }
     public static void Verbose(String message) {
         if (MainClient.irc.Verbosity != IrcVerbosity.VERBOSE &&
         MainClient.irc.Verbosity != IrcVerbosity.RAW) return;
-        message = message.replace("§r", "§9");
-
-        message("§9[VERB] " + message);
+        Component parsedMsg = mm.deserialize("<gray>[VERB] " + message + "</gray>");
+        message(parsedMsg);
     }
     public static class IRCMessageTemplates {
         public static void Notice(String source, String channel, String content) {
             // Target:
             // &9[Channel]&r | &6[NOTICE]&r <&[Source]&r> [Contents]
-            String message = "§9" + channel + "§r | §6[NOTICE]§r <§c" + source + "§r> " + content;
-            message(message);
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <gold>[NOTICE]</gold> | <<red>"
+                    + MessageHandler.GetFormattedUser(source, channel) + "</red>> " + content);
+            message(parsedMsg);
         }
         public static void Message(String source, String channel, String content) {
             // #ss15 | <FJSAGS_Web> i need this for testing and understanding of IRC protocol...
             // §9#ss15§r | <§cFJSAGS_Web§r> i need this for testing and understanding of IRC protocol...
             if (channel.startsWith("#")) {
-                String message = "§9" + channel + "§r | <§c" + FormatRoles(channel, source).replace("§r", "§c") + "§r> "
-                        + content;
-                message(message);
+                Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <<red>"
+                        + MessageHandler.GetFormattedUser(source, channel) + "</red>> " + content);
+                message(parsedMsg);
             }
             else {
-                String message = "§6" + channel + " [PM]§r | <§c" + source + "§r> " + content;
-                message(message);
+                Component parsedMsg = mm.deserialize("<gold>" + channel + " [PM]</gold> | <<red>" + source + "</red>> " + content);
+                message(parsedMsg);
             }
         }
         public static void Topic(String channel, String content) {
-            String message = "§9" + channel + "§r | §6Topic§r: " + content;
-            message(message);
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <gold>Topic</gold>:" + content);
+            message(parsedMsg);
         }
         public static void TopicSetBy(String channel, String content) {
-            String message = "§9 " + channel + "§r | §6Topic set by§r: " + MessageHandler.GetFormattedUser(content, channel);
-            message(message);
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <gold>Topic set by</gold>: "
+                    + MessageHandler.GetFormattedUser(content, channel));
+            message(parsedMsg);
         }
         public static void Join(String source, String channel) {
-            String message = "§9" + channel + "§r | + " + FormatRoles(channel, source);
-            message(message);
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <green>+</green> " + MessageHandler.GetFormattedUser(channel, source));
+            message(parsedMsg);
         }
         public static void Part(String source, String channel, String reason) {
-            String message = "§9" + channel + "§r | - " + FormatRoles(channel, source) + ": " + reason;
-            message(message);
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <red>-</red> " + MessageHandler.GetFormattedUser(channel, source));
+            message(parsedMsg);
         }
 
-    }
-    private static String FormatRoles(String channel, String person) {
-        person = person.split("!")[0]; // Don't ask.
-        if (!MessageHandler.StatusPrefixes.containsKey(channel)) return person;
-        Map<String, IRCUserModes> channelMap = MessageHandler.StatusPrefixes.get(channel);
-        if (!channelMap.containsKey(person)) return person;
-        return switch (channelMap.get(person)) {
-            case OWNER -> "§e~§r";
-            case ADMIN -> "§6&§r";
-            case OPERATOR -> "§a@§r";
-            case HALF_OPERATOR -> "§1%§r";
-            case VOICE -> "§b+§r";
-            case NONE -> person;
-        };
     }
 }

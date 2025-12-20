@@ -67,11 +67,14 @@ public class MainClient implements ClientModInitializer {
         SimpleIrcCommand.Register();
 	}
     public static void Connect() {
-        ChatUtils.Info("Invoked MainClient.Connect()");
         MainClient.irc = new IRCNetwork(Main.getSettings().ip, Main.getSettings().port, ChatUtils.getUsername(),
                 Main.getSettings().backupnick, Main.getSettings().verbosity);
-        ChatUtils.Info("Created IRCNetwork");
-        MainClient.irc.Connect();
+        try {
+            MainClient.irc.Connect();
+        } catch (IllegalStateException e) {
+            ChatUtils.Error("Failed to connect to IRC:");
+            ChatUtils.Error(e);
+        }
     }
     public static void Disconnect(String reason) {
         if (Objects.equals(reason, "")) {

@@ -43,8 +43,12 @@ public class ConnectCommand {
 
 
     private static int Connect(CommandContext<FabricClientCommandSource> ctx) {
-        ctx.getSource().sendFeedback(Text.literal("Invoked /simpleirc connect"));
-        MainClient.Connect();
+        try {
+            MainClient.Connect();
+        }
+        catch (IllegalStateException e) {
+            ChatUtils.Error(e);
+        }
         return 0;
     }
 }

@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;
+import org.atmosia.simpleirc.ChatUtils;
 import org.atmosia.simpleirc.MainClient;
 import org.atmosia.simpleirc.classes.IRCChannel;
 import org.atmosia.simpleirc.commands.suggestions.ConnectedChannelsSuggester;
@@ -17,8 +18,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 public class IRCBasicCommands {
     public static LiteralArgumentBuilder<FabricClientCommandSource> Register(LiteralArgumentBuilder<FabricClientCommandSource> command) {
         command.then(ClientCommandManager.literal("join")
-                .then(argument("channel", StringArgumentType.string()).executes(IRCBasicCommands::Join)
-                        .then(argument("password", StringArgumentType.string()).executes(IRCBasicCommands::JoinWithPass))))
+                .then(argument("[channel] [password (optional)]", StringArgumentType.greedyString()).executes(IRCBasicCommands::Join)))
                 .then(ClientCommandManager.literal("part")
                         .then(argument("channel", StringArgumentType.string())
                                 .suggests(new ConnectedChannelsSuggester())
@@ -31,12 +31,12 @@ public class IRCBasicCommands {
 
     private static int Part(CommandContext<FabricClientCommandSource> context) {
         if (MainClient.irc == null || !MainClient.irc.isConnected()) {
-            context.getSource().sendError(Text.literal("You are not connected to IRC server."));
+            ChatUtils.Error("Error on parting: You are not connected to IRC server.");
             return -1;
         }
         var channel = context.getArgument("channel", String.class);
         if (channel.isEmpty()) {
-            context.getSource().sendError(Text.literal("Please specify a channel."));
+            ChatUtils.Error("Error on parting: Please specify a channel.");
         }
         var ircChannel = MainClient.irc.GetChannel(channel);
         MainClient.irc.SendLine(ircChannel.Part("Leaving"));
@@ -47,27 +47,17 @@ public class IRCBasicCommands {
         MainClient.irc.SendLine(context.getArgument("command", String.class));
         return 0;
     }
-
-    private static int JoinWithPass(CommandContext<FabricClientCommandSource> context) {
-        if (MainClient.irc == null || !MainClient.irc.isConnected()) {
-            context.getSource().sendError(Text.literal("You are not connected to IRC server."));
-            return -1;
-        }
-        var channel = context.getArgument("channel", String.class);
-        var password = context.getArgument("password", String.class);
-        MainClient.irc.AddChannel(new IRCChannel("#" + channel, password, true));
-        return 0;
-    }
-
     private static int Join(CommandContext<FabricClientCommandSource> context) {
 
         if (MainClient.irc == null || !MainClient.irc.isConnected()) {
-            context.getSource().sendError(Text.literal("You are not connected to IRC server."));
+            ChatUtils.Error("Error on joining: You are not connected to IRC server.");
             return -1;
         }
-        var channel = context.getArgument("channel", String.class);
-
-        MainClient.irc.AddChannel(new IRCChannel("#" + channel, "", true));
+        var arguments = context.getArgument("[channel] [password (optional)]", String.class);
+        var splits = arguments.split(" ");
+        var channel = splits[0].trim();
+        var password = splits[1].length() > 1 ? splits[1] : "";
+        MainClient.irc.AddChannel(new IRCChannel(channel, password, false), true);
         return 0;
     }
 }

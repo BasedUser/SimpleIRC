@@ -11,6 +11,7 @@ base {
 }
 
 repositories {
+    mavenCentral()
 	maven {
         url 'https://jitpack.io'
     }
@@ -45,7 +46,12 @@ loom {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
+        "fabric-automessage" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
 	}
+
 
 }
 
@@ -76,6 +82,9 @@ dependencies {
 	// Replace Tag with the current version you can find at the top of this page
     modImplementation("com.github.Lortseam.completeconfig:base:2.5.1")
 	modImplementation("com.github.Lortseam.completeconfig:gui-cloth:2.5.1")
+    modImplementation include("net.kyori:adventure-platform-fabric:6.6.0")
+    modImplementation "net.kyori:adventure-text-minimessage:4.25.0"
+
 }
 
 processResources {
