@@ -147,7 +147,7 @@ public class IRCNetwork {
             Socket = (SSLSocket) factory.createSocket(Ip, Port);
             ChatUtils.RawOut("Setting protocols...");
             Socket.setEnabledProtocols(new String[] {"TLSv1.2", "TLSv1.3"});
-            Socket.setSoTimeout(5000);
+            // Socket.setSoTimeout(5000); breaks everything...
             ChatUtils.RawOut("Starting handshake... <dark_green>// Usually this is the point it gets stuck</dark_green>");
             Socket.startHandshake();
             ChatUtils.RawOut("Getting writer...");
