@@ -1,5 +1,7 @@
 package org.atmosia.simpleirc;
 
+import net.minecraft.stat.Stat;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,15 +56,30 @@ public class MessageHandler {
             ChatUtils.IRCMessageTemplates.Message(source, channel, content.replaceFirst(":", ""));
         }
         else if (command.equals("JOIN")) {
-            // FJSAGS_Web!FJSAGS@B8B9A07F.B3E0603E.2BC670DC.IP JOIN :#ss15-pub
+            // FJSAGS_Web!FJSAGS@Ip JOIN :#ss15-pub
             ChatUtils.IRCMessageTemplates.Join(source.split("!")[0], channel.substring(channel.indexOf(':') + 1));
         }
         else if (command.equals("PART")) {
-            // Source =  FJSAGS_Web!FJSAGS@B8B9A07F.B3E0603E.2BC670DC.IP
+            // Source =  FJSAGS_Web!FJSAGS@Ip
             // Command = PART
             // Channel = #ss15-pub
             // Content = :Leaving
             ChatUtils.IRCMessageTemplates.Part(source.split("!")[0], channel, content.substring(channel.indexOf(':') + 1));
+        }
+        else if (command.equals("NICK")) {
+            // :FJs NICK :FJSAGS_
+            // Source = FJs
+            // Command = NICK
+            // Content = :FJSAGS_
+            if (MainClient.irc.nickname().equals(channel.substring(1))) {
+                MainClient.irc.SetDisplayNickname(channel.replaceFirst(":", ""));
+
+            }
+            for (var entry : StatusPrefixes.values()) {
+                IRCUserModes mode = entry.remove(source);
+                entry.putIfAbsent(source.split("!")[0], mode);
+            }
+            ChatUtils.Notify(source.split("!")[0] + " nickname is now " + channel.substring(channel.indexOf(':') + 1));
         }
     }
     private static void HandleNumeric(String source, Integer numeric, String channel, String content) {
@@ -129,6 +146,17 @@ public class MessageHandler {
             // :baseduser.eu.org 404 FJSAGS #ss16 :No external channel messages...
             var actualContent = content.split(":")[1];
             ChatUtils.IRCMessageTemplates.Message(source, channel, actualContent);
+        } else if (numeric == 433) {
+            // [RAW <=] :baseduser.eu.org 433 * FJSAGS :Nickname is already in use.
+            // Source = baseduser.eu.org
+            // Numeric = 433
+            // Channel = *
+            // Content = FJSAGS :No such nick/channel
+            var nicknameInUse = content.split(":")[0];
+
+            ChatUtils.Error("Nickname <blue>" + nicknameInUse + "</blue> is already in use!");
+            ChatUtils.Error("Reconnecting using a backup nickname!");
+            MainClient.irc.UseBackupNickname();
         }
     }
 

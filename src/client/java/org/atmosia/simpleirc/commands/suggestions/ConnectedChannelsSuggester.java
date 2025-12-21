@@ -13,8 +13,12 @@ import java.util.concurrent.CompletableFuture;
 public class ConnectedChannelsSuggester implements SuggestionProvider<FabricClientCommandSource> {
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<FabricClientCommandSource> commandContext, SuggestionsBuilder suggestionsBuilder) throws CommandSyntaxException {
+        if (MainClient.irc == null) {
+            return suggestionsBuilder.buildFuture();
+        }
+
         for (var channel : MainClient.irc.channels()) {
-            suggestionsBuilder.suggest(channel.Name.substring(1));
+            suggestionsBuilder.suggest(channel.Name);
         }
         return suggestionsBuilder.buildFuture();
     }
