@@ -4,6 +4,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 
 import org.atmosia.simpleirc.*;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,19 +13,27 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public class ChatManager {
-
-
+public abstract class ChatManager {
     @Shadow
-    @Final
-    private static Logger LOGGER;
+    public abstract void sendChatMessage(String content);
+
+    private static Boolean pleaseMinecraft = false;
     @Inject(at = @At("HEAD"), method = "sendChatMessage", cancellable = true)
     private void onSendChatMessage(String message, CallbackInfo info) 
     {
+        if (pleaseMinecraft) {
+            pleaseMinecraft = false;
+            return;
+        }
         if (message == null) {
             return;
         }
         boolean skipIrcStuff = MainClient.irc == null || message.charAt(0) == MainClient.MinecraftChatPrefix;
+        if (message.charAt(0) == MainClient.MinecraftChatPrefix) {
+            pleaseMinecraft = true;
+            sendChatMessage(message.substring(1));
+            info.cancel();
+        }
         if (skipIrcStuff) {
             Main.LOGGER.info("Sent message to normal chat, since one condition isn't satisfied");
         }
@@ -49,9 +58,6 @@ public class ChatManager {
                 info.cancel();
             }
 
-            if (message.startsWith(MainClient.MinecraftChatPrefix.toString())) {
-                message = message.replaceFirst(MainClient.MinecraftChatPrefix.toString(), "");
-            }
         }
 
         // Normal chat / IRC bridging
