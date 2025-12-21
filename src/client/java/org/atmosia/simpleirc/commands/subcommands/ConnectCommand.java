@@ -4,14 +4,12 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.sun.jdi.connect.Connector;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
 import org.atmosia.simpleirc.ChatUtils;
 import org.atmosia.simpleirc.Main;
 import org.atmosia.simpleirc.MainClient;
-import org.atmosia.simpleirc.classes.IRCNetwork;
+import org.atmosia.simpleirc.IRCNetwork;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 

@@ -2,15 +2,10 @@ package org.atmosia.simpleirc;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import org.atmosia.simpleirc.classes.MessageHandler;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import java.awt.*;
-import java.util.Map;
 
 public enum ChatUtils{
 	; // <-- WHAT THE FUCK?????

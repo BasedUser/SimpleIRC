@@ -1,16 +1,13 @@
 package org.atmosia.simpleirc.commands.subcommands;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
 import org.atmosia.simpleirc.ChatUtils;
 import org.atmosia.simpleirc.MainClient;
-import org.atmosia.simpleirc.classes.IRCChannel;
+import org.atmosia.simpleirc.IRCChannel;
 import org.atmosia.simpleirc.commands.suggestions.ConnectedChannelsSuggester;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;

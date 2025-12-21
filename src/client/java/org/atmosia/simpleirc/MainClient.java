@@ -1,6 +1,5 @@
 package org.atmosia.simpleirc;
 
-import org.atmosia.simpleirc.classes.IRCNetwork;
 import org.atmosia.simpleirc.commands.SimpleIrcCommand;
 import org.lwjgl.glfw.GLFW;
 

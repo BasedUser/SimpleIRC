@@ -1,15 +1,9 @@
 package org.atmosia.simpleirc.mixin.client;
 
-import java.util.StringTokenizer;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.atmosia.simpleirc.*;
-import org.atmosia.simpleirc.classes.IRCNetwork;
-import org.atmosia.simpleirc.classes.MessageHandler;
 import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
