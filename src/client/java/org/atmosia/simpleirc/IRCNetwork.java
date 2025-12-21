@@ -1,5 +1,7 @@
 package org.atmosia.simpleirc;
 
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
@@ -14,6 +16,7 @@ public class IRCNetwork {
     private Integer Port;
     private String Nickname;
     private String BackupNickname;
+    private Boolean UseBackupNickname = false;
     public IrcVerbosity Verbosity;
     private List<IRCChannel> Channels;
     private String PrimaryChannel;
@@ -39,17 +42,21 @@ public class IRCNetwork {
             ChatUtils.Info("Already connected, doing nothing");
             return;
         }
+        CallbackInfo callbackInfo = new CallbackInfo("IRC connection", true);
         try {
         new Thread(() ->
         {
-            VerifyFields();
-            ChatUtils.Info("Verified fields for connection");
-            OpenSocket();
-            ChatUtils.Info("Opened socket for connection");
+
+            VerifyFields(callbackInfo);
+            if (callbackInfo.isCancelled()) return;
+            ChatUtils.RawOut("Verified fields for connection");
+            OpenSocket(callbackInfo);
+            if (callbackInfo.isCancelled()) return;
+            ChatUtils.RawOut("Opened socket for connection");
             Listener();
-            ChatUtils.Info("Started listener");
+            ChatUtils.RawOut("Started listener");
             Register();
-            ChatUtils.Info("Registered user");
+            ChatUtils.RawOut("Registered user");
             synchronized (initialConnectionFinished) {
                 try {
                     ChatUtils.Info("Waiting for a welcome message...");
@@ -78,6 +85,7 @@ public class IRCNetwork {
         catch (IllegalStateException e) {
             ChatUtils.Error("Error connecting to server: ");
             ChatUtils.Error(e);
+            callbackInfo.cancel();
             return;
         }
 
@@ -131,23 +139,33 @@ public class IRCNetwork {
 
 
     }
-    private void OpenSocket() throws RuntimeException {
+    private void OpenSocket(CallbackInfo callbackInfo) {
         try {
+            ChatUtils.RawOut("Creating socket factory...");
             SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+            ChatUtils.RawOut("Creating socket...");
             Socket = (SSLSocket) factory.createSocket(Ip, Port);
+            ChatUtils.RawOut("Setting protocols...");
             Socket.setEnabledProtocols(new String[] {"TLSv1.2", "TLSv1.3"});
+            Socket.setSoTimeout(100);
+            ChatUtils.RawOut("Starting handshake... <dark_green>// Usually this is the point it gets stuck</dark_green>");
             Socket.startHandshake();
+            ChatUtils.RawOut("Getting writer...");
             Writer = new BufferedWriter(new OutputStreamWriter(Socket.getOutputStream()));
+            ChatUtils.RawOut("And reader...");
             Reader = new BufferedReader(new InputStreamReader(Socket.getInputStream()));
+            ChatUtils.RawOut("Done, lets proceed");
+            ChatUtils.Info("Connected to server <blue>" + Ip + "</blue>");
+
         }
         catch (IOException e) {
+            callbackInfo.cancel();
 //          ChatUtils.Exception(new Exception("An exception happened while connecting to the server:\n" + e.getMessage()));
             ChatUtils.Error("An exception happened while connecting to the server: " + e.getMessage() + "\n Usually this happens if ip or port are incorrect.");
         }
-        ChatUtils.Info("Connected to server <blue>" + Ip + "</blue>");
     }
 
-    private void VerifyFields() throws IllegalStateException {
+    private void VerifyFields(CallbackInfo callbackInfo) throws IllegalStateException {
         if (Ip.isEmpty() || Port < 1) {
             throw new IllegalStateException("Ip or Port stated are certainly invalid. Please check them before connecting again.");
         }
@@ -218,9 +236,10 @@ public class IRCNetwork {
         Port = port;
     }
     public String nickname() {
+        if (UseBackupNickname) return BackupNickname;
         return Nickname;
     }
-    public void SetNickname(String nickname) {
+    public void SetDisplayNickname(String nickname) {
         Nickname = nickname;
     }
     public void SetBackupNickname(String backupNickname) {
@@ -276,9 +295,13 @@ public class IRCNetwork {
         return GetChannel(characterStringHashMap.get(prefix));
     }
     public void AddChannelByPrefix(Character prefix, IRCChannel channel) {
-        if (Channels.stream().noneMatch(x -> Objects.equals(x.Name, prefix))) {
+        if (Channels.stream().noneMatch(x -> Objects.equals(x.Name, channel.Name))) {
             AddChannel(channel, true);
         }
         characterStringHashMap.putIfAbsent(prefix, channel.Name);
+    }
+    public void UseBackupNickname() {
+        SendLine("NICK " + BackupNickname);
+        UseBackupNickname = true;
     }
 }

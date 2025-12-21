@@ -16,7 +16,9 @@ import java.util.Objects;
 public class MainClient implements ClientModInitializer {	
 	public static IRCNetwork irc = null;
     public static Boolean DefaultToMinecraftChat = false;
-	private static KeyBinding JBind = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static Character MinecraftChatPrefix = '!';
+
+    private static KeyBinding JBind = KeyBindingHelper.registerKeyBinding(new KeyBinding(
     	    "key.simpleirc.config", // The translation key of the keybinding's name
     	    InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
     	    GLFW.GLFW_KEY_J, // The keycode of the key
@@ -81,5 +83,4 @@ public class MainClient implements ClientModInitializer {
         }
         MainClient.irc.Disconnect(reason);
     }
-
 }

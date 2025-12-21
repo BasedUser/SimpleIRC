@@ -9,43 +9,48 @@ import net.minecraft.text.Text;
 import org.atmosia.simpleirc.ChatUtils;
 import org.atmosia.simpleirc.MainClient;
 import org.atmosia.simpleirc.commands.suggestions.ConnectedChannelsAndMcSuggester;
-import org.atmosia.simpleirc.commands.suggestions.ConnectedChannelsSuggester;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 
 public class SetPrefixForChatCommand {
     public static LiteralArgumentBuilder<FabricClientCommandSource> Register(LiteralArgumentBuilder<FabricClientCommandSource> command) {
         command.then(ClientCommandManager.literal("setchannelprefix")
-                .then(argument("channel", StringArgumentType.string())
-                        .suggests(new ConnectedChannelsSuggester())
-                        .then(argument("prefix", StringArgumentType.greedyString())
-                                .executes(SetPrefixForChatCommand::SetPrefix))))
+                .then(argument("[channel] [prefix]", StringArgumentType.greedyString())
+                        .suggests(new ConnectedChannelsAndMcSuggester())
+                                .executes(SetPrefixForChatCommand::SetPrefix)))
                 .then(ClientCommandManager.literal("defaultchannel")
-                        .then(argument("channel", StringArgumentType.string())
+                        .then(argument("channel", StringArgumentType.greedyString())
                                 .suggests(new ConnectedChannelsAndMcSuggester())
-                                .executes(SetPrefixForChatCommand::SetDefaultChannel)))
-                ;
+                                .executes(SetPrefixForChatCommand::SetDefaultChannel)));
         return command;
     }
     private static int SetPrefix(CommandContext<FabricClientCommandSource> context) {
+        ChatUtils.RawOut("setting prefix command invoked");
         if (MainClient.irc == null || !MainClient.irc.isConnected()) {
             context.getSource().sendError(Text.literal("You are not connected to IRC server."));
             return -1;
         }
-        var channel = context.getArgument("channel", String.class);
-        String prefix = StringArgumentType.getString(context, "prefix");
+        var args = context.getArgument("[channel] [prefix]", String.class);
+        var channel = args.split(" ")[0];
+        var prefix = args.split(" ")[1];
         if (prefix.length() != 1) {
             context.getSource().sendError(Text.literal("Prefix must be a single character."));
             return -1;
         }
-        if (MainClient.irc.GetChannel(channel) == null) {
+        if (MainClient.irc.GetChannel(channel) == null && !channel.equals("#minecraft_chat")) {
             context.getSource().sendError(Text.literal("You aren't connected to such channel."));
             return -1;
         }
+
         Character prefixChar = prefix.charAt(0);
+        if (channel.equals("#minecraft_chat")) {
+            MainClient.MinecraftChatPrefix = prefixChar;
+            ChatUtils.Notify("Added prefix <gray>" + prefixChar + "</gray> to channel <gray>" + channel + "</gray>");
+            return 1;
+        }
         MainClient.irc.AddChannelByPrefix(prefixChar, MainClient.irc.GetChannel(channel));
 
-        ChatUtils.Notify("Added prefix §7" + prefixChar + "§r to channel §7" + channel);
+        ChatUtils.Notify("Added prefix <gray>" + prefixChar + "</gray> to channel <gray>" + channel + "</gray>");
 
         return 0;
     }
@@ -55,11 +60,11 @@ public class SetPrefixForChatCommand {
             return -1;
         }
         var channel = context.getArgument("channel", String.class);
-        if (MainClient.irc.GetChannel(channel) == null && !channel.equals("minecraft_chat")) {
+        if (MainClient.irc.GetChannel(channel) == null && !channel.equals("#minecraft_chat")) {
             context.getSource().sendError(Text.literal("You aren't connected to such channel."));
             return -1;
         }
-        else if (channel.equals("minecraft_chat")) {
+        else if (channel.equals("#minecraft_chat")) {
             MainClient.DefaultToMinecraftChat = true;
         } else {
             MainClient.DefaultToMinecraftChat = false;

@@ -18,14 +18,13 @@ public class ChatManager {
     @Shadow
     @Final
     private static Logger LOGGER;
-
     @Inject(at = @At("HEAD"), method = "sendChatMessage", cancellable = true)
     private void onSendChatMessage(String message, CallbackInfo info) 
     {
         if (message == null) {
             return;
         }
-        boolean skipIrcStuff = MainClient.irc == null || MainClient.DefaultToMinecraftChat || message.charAt(0) == '!';
+        boolean skipIrcStuff = MainClient.irc == null || message.charAt(0) == MainClient.MinecraftChatPrefix;
         if (skipIrcStuff) {
             Main.LOGGER.info("Sent message to normal chat, since one condition isn't satisfied");
         }
@@ -49,8 +48,11 @@ public class ChatManager {
                 ChatUtils.IRCMessageTemplates.Message(selfNick, currentChannel, message);
                 info.cancel();
             }
-        }
 
+            if (message.startsWith(MainClient.MinecraftChatPrefix.toString())) {
+                message = message.replaceFirst(MainClient.MinecraftChatPrefix.toString(), "");
+            }
+        }
 
         // Normal chat / IRC bridging
 
@@ -115,4 +117,5 @@ public class ChatManager {
 //				return;
 //		}
     }
+
 }

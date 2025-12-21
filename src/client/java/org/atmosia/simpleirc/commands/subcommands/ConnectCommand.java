@@ -18,23 +18,21 @@ public class ConnectCommand {
         command.then(ClientCommandManager.literal("connect").executes(ConnectCommand::Connect)
                 .then(argument("server_ip", StringArgumentType.string())
                         .then(argument("server_port", IntegerArgumentType.integer(0, 65535))
-                                .then(argument("channel", StringArgumentType.string())
-                                        .then(argument("password", StringArgumentType.string())
-                                                .executes(ConnectCommand::ConnectWithArgs))
+                                .then(argument("channel password", StringArgumentType.greedyString())
+                                        .executes(ConnectCommand::ConnectWithArgs))
                                 )
                         )
-                )
-        );
+                );
         return command;
     }
 
     private static int ConnectWithArgs(CommandContext<FabricClientCommandSource> ctx) {
         var server = ctx.getArgument("server_ip", String.class);
         var serverPort = ctx.getArgument("server_port", Integer.class);
-        var channel = ctx.getArgument("channel", String.class);
-        var password = ctx.getArgument("password", String.class);
-
-        MainClient.irc = new IRCNetwork(server, serverPort, channel, password, Main.getSettings().verbosity);
+        var channelString = ctx.getArgument("channel", String.class);
+        var channel = channelString.split(" ")[0];
+        var channelPassword = channelString.split(" ")[1];
+        MainClient.irc = new IRCNetwork(server, serverPort, channel, channelPassword, Main.getSettings().verbosity);
         MainClient.irc.Connect();
         return 0;
     }

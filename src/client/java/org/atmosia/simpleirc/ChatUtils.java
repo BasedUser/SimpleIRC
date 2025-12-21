@@ -3,8 +3,6 @@ package org.atmosia.simpleirc;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.text.Text;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public enum ChatUtils{
@@ -14,12 +12,6 @@ public enum ChatUtils{
 	
 	private static final MinecraftClient MCInstance = MinecraftClient.getInstance();
     private static MiniMessage mm = MiniMessage.miniMessage();
-	public static void component(Text component)
-	{
-		ChatHud chatHud = MCInstance.inGameHud.getChatHud();
-		chatHud.addMessage(component);
-	}
-	
 	public static void message(Component message)
 	{
 		Audience player = MCInstance.player;
@@ -94,7 +86,7 @@ public enum ChatUtils{
             }
         }
         public static void Topic(String channel, String content) {
-            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <gold>Topic</gold>:" + content);
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <gold>Topic</gold>: " + content);
             message(parsedMsg);
         }
         public static void TopicSetBy(String channel, String content) {
@@ -103,11 +95,11 @@ public enum ChatUtils{
             message(parsedMsg);
         }
         public static void Join(String source, String channel) {
-            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <green>+</green> " + MessageHandler.GetFormattedUser(channel, source));
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <green>+</green> " + MessageHandler.GetFormattedUser(source, channel));
             message(parsedMsg);
         }
         public static void Part(String source, String channel, String reason) {
-            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <red>-</red> " + MessageHandler.GetFormattedUser(channel, source));
+            Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <red>-</red> " + MessageHandler.GetFormattedUser(source, channel));
             message(parsedMsg);
         }
 
