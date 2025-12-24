@@ -2,6 +2,7 @@ package org.atmosia.simpleirc.mixin.client;
 
 import java.util.concurrent.TimeUnit;
 
+import net.minecraft.network.DisconnectionInfo;
 import org.atmosia.simpleirc.ChatUtils;
 import org.atmosia.simpleirc.Main;
 
@@ -42,10 +43,27 @@ public abstract class ClientPlayNetworkHandlerMixin implements ClientPacketListe
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if(Main.getSettings().autoconnect)
+				if(Main.settings.autoconnect())
 				{
                     MainClient.Connect();
 				}
 			}).start();
+            if (MainClient.irc != null && MainClient.irc.IsAway)
+            {
+                MainClient.irc.SendLine("AWAY");
+                ChatUtils.Notify("You are no longer marked as away");
+            }
 		}
+        @Inject(
+                at = @At("HEAD"),
+                method = "onDisconnected",
+                cancellable = false
+        )
+    private void onDisconnected(DisconnectionInfo info, CallbackInfo ci)
+    {
+        if (MainClient.irc == null) return;
+        if (!MainClient.irc.isConnected()) return;
+        MainClient.irc.SendLine("AWAY Is in main menu");
+        MainClient.irc.IsAway = true;
+    }
 }

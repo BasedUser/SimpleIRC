@@ -24,10 +24,7 @@
     ],
     "client": [
       "org.atmosia.simpleirc.MainClient"
-    ],
-    "modmenu":[
-		"org.atmosia.simpleirc.ModMenuIntegration"
-	]
+    ]
   },
   "mixins": [
     "simpleirc.mixins.json",

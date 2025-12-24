@@ -1,5 +1,6 @@
 package org.atmosia.simpleirc;
 
+import net.kyori.adventure.text.event.ClickEvent;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.net.ssl.SSLSocket;
@@ -26,7 +27,8 @@ public class IRCNetwork {
     private BufferedWriter Writer;
     private static HashMap<Character, String> characterStringHashMap = new HashMap<>();
     private final AtomicBoolean initialConnectionFinished;
-
+    private final AtomicBoolean registeredSasl;
+    public Boolean IsAway;
     public IRCNetwork(String ip, Integer port, String nickname, String backupNickname, IrcVerbosity verbosity) {
         Ip = ip;
         Port = port;
@@ -36,6 +38,7 @@ public class IRCNetwork {
         Channels = new ArrayList<>();
         IsConnected = false;
         initialConnectionFinished = new AtomicBoolean(false);
+        registeredSasl = new AtomicBoolean(false);
     }
     public void Connect() {
         if (isConnected()) {
@@ -44,45 +47,51 @@ public class IRCNetwork {
         }
         CallbackInfo callbackInfo = new CallbackInfo("IRC connection", true);
         try {
-        new Thread(() ->
-        {
+            new Thread(() ->
+            {
 
-            VerifyFields(callbackInfo);
-            if (callbackInfo.isCancelled()) return;
-            ChatUtils.RawOut("Verified fields for connection");
-            OpenSocket(callbackInfo);
-            if (callbackInfo.isCancelled()) return;
-            ChatUtils.RawOut("Opened socket for connection");
-            Listener();
-            ChatUtils.RawOut("Started listener");
-            Register();
-            ChatUtils.RawOut("Registered user");
-            synchronized (initialConnectionFinished) {
-                try {
-                    ChatUtils.Info("Waiting for a welcome message...");
-                    initialConnectionFinished.wait();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                VerifyFields(callbackInfo);
+                if (callbackInfo.isCancelled()) return;
+                ChatUtils.Debug("Verified fields for connection");
+                OpenSocket(callbackInfo);
+                if (callbackInfo.isCancelled()) return;
+                ChatUtils.Debug("Opened socket for connection");
+                Listener();
+                ChatUtils.Debug("Started listener");
+                Register();
+                ChatUtils.Debug("Registered user");
+                synchronized (initialConnectionFinished) {
+                    try {
+                        ChatUtils.Info("Waiting for a welcome message...");
+                        initialConnectionFinished.wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    ChatUtils.Success("Successfully connected to IRC network " + Ip + ".");
+                    ChatUtils.Notify("Done. You should be now connected to IRC.");
+                    IsConnected = true;
                 }
-                ChatUtils.Success("Successfully connected to IRC network " + Ip + ".");
-                ChatUtils.Notify("Connecting to channels with auto connect flag...");
-                GetChannelsInConfig();
-                for (IRCChannel channel : Channels) {
-                    if (!channel.AutoConnectFlag) continue;
-                    PrimaryChannel = channel.Name;
-                    ChatUtils.Info("Joining channel " + channel.Name + "...");
-                    SendLine(channel.Join());
-                    if (Channels.indexOf(channel) == 0) {
-                        characterStringHashMap.putIfAbsent('@', channel.Name);
+                for (var command : Main.settings.postConnectionCommands()) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        ChatUtils.Error("Error sending command: Sleep interrupted");
+                    }
+                    try {
+                        var time = Integer.parseInt(command.split(" ")[1]);
+                        if (command.startsWith("wait")) {
+                            Thread.sleep(time);
+                        }
+                    } catch (NumberFormatException e) {
+                        SendLine(command);
+                    } catch (InterruptedException e) {
+                        ChatUtils.Error("Error sending command: Sleep interrupted");
                     }
                 }
+            }).start();
 
-                ChatUtils.Notify("Done. You should be now connected to IRC.");
-                IsConnected = true;
-            }
-        }).start();
-        }
-        catch (IllegalStateException e) {
+
+        } catch (IllegalStateException e) {
             ChatUtils.Error("Error connecting to server: ");
             ChatUtils.Error(e);
             callbackInfo.cancel();
@@ -91,12 +100,6 @@ public class IRCNetwork {
 
 
     }
-
-    private void GetChannelsInConfig() {
-        var config = Main.getSettings();
-        Channels.add(new IRCChannel(config.channel, config.password, config.autoconnect));
-    }
-
     private void Listener() {
         new Thread(() -> {
             try {
@@ -119,8 +122,8 @@ public class IRCNetwork {
         // still TODO explicit server password? might be useful with SASL PLAIN
         SendLine("NICK " + Nickname);
         SendLine("USER " + Nickname + " mc * : " + Nickname);
-
     }
+
     public void SendLine(String line) {
         if (Writer == null)
             throw new IllegalStateException("Writer is not connected to a server. Are you connected?");
@@ -141,20 +144,20 @@ public class IRCNetwork {
     }
     private void OpenSocket(CallbackInfo callbackInfo) {
         try {
-            ChatUtils.RawOut("Creating socket factory...");
+            ChatUtils.Debug("Creating socket factory...");
             SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-            ChatUtils.RawOut("Creating socket...");
+            ChatUtils.Debug("Creating socket...");
             Socket = (SSLSocket) factory.createSocket(Ip, Port);
-            ChatUtils.RawOut("Setting protocols...");
+            ChatUtils.Debug("Setting protocols...");
             Socket.setEnabledProtocols(new String[] {"TLSv1.2", "TLSv1.3"});
             // Socket.setSoTimeout(5000); breaks everything...
-            ChatUtils.RawOut("Starting handshake... <dark_green>// Usually this is the point it gets stuck</dark_green>");
+            ChatUtils.Debug("Starting handshake... <dark_green>// Usually this is the point it gets stuck</dark_green>");
             Socket.startHandshake();
-            ChatUtils.RawOut("Getting writer...");
+            ChatUtils.Debug("Getting writer...");
             Writer = new BufferedWriter(new OutputStreamWriter(Socket.getOutputStream()));
-            ChatUtils.RawOut("And reader...");
+            ChatUtils.Debug("And reader...");
             Reader = new BufferedReader(new InputStreamReader(Socket.getInputStream()));
-            ChatUtils.RawOut("Done, lets proceed");
+            ChatUtils.Debug("Done, lets proceed");
             ChatUtils.Info("Connected to server <blue>" + Ip + "</blue>");
 
         }
@@ -202,7 +205,6 @@ public class IRCNetwork {
                 initialConnectionFinished.notify();
             }
         }
-
         MessageHandler.HandleMessage(input);
     }
 
@@ -286,6 +288,9 @@ public class IRCNetwork {
         if (connect) {
             ChatUtils.Info("Joining channel " + channel.Name + "...");
             SendLine(channel.Join());
+        }
+        if (Channels.size() == 1) {
+            SetPrimaryChannel(channel.Name);
         }
     }
     public IRCChannel GetChannel(String channelName) {

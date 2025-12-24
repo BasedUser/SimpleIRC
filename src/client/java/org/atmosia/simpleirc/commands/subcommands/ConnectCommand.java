@@ -32,7 +32,7 @@ public class ConnectCommand {
         var channelString = ctx.getArgument("channel", String.class);
         var channel = channelString.split(" ")[0];
         var channelPassword = channelString.split(" ")[1];
-        MainClient.irc = new IRCNetwork(server, serverPort, channel, channelPassword, Main.getSettings().verbosity);
+        MainClient.irc = new IRCNetwork(server, serverPort, channel, channelPassword, Main.settings.verbosity());
         MainClient.irc.Connect();
         return 0;
     }

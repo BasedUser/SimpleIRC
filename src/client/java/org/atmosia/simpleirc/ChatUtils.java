@@ -15,7 +15,11 @@ public enum ChatUtils{
 	public static void message(Component message)
 	{
 		Audience player = MCInstance.player;
-        player.sendMessage(message);
+        try {
+            player.sendMessage(message);
+        } catch (Exception e) {
+            Main.LOGGER.warn("Exception while displaying message: ", e);
+        }
 	}
 	
 	public static String getUsername()
@@ -64,6 +68,13 @@ public enum ChatUtils{
         Component parsedMsg = mm.deserialize("<gray>[VERB] " + message + "</gray>");
         message(parsedMsg);
     }
+
+    public static void Debug(String message) {
+        if (MainClient.irc.Verbosity != IrcVerbosity.DEBUG) return;
+        Component parsedMsg = mm.deserialize("<#00FFFF>[DEBUG] " + message + "</#00FFFF>");
+        message(parsedMsg);
+    }
+
     public static class IRCMessageTemplates {
         public static void Notice(String source, String channel, String content) {
             // Target:

@@ -1,19 +1,19 @@
 package org.atmosia.simpleirc;
 
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.annotation.Config;
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import io.wispforest.owo.config.annotation.Config;
+import io.wispforest.owo.config.annotation.Modmenu;
 
-@Config(name = "simpleirc")
-public class Ircgroup implements ConfigData {
+import java.util.ArrayList;
+import java.util.List;
+
+@Modmenu(modId = "simpleirc")
+@Config(name = "simple-irc", wrapperName = "SimpleIRCConfig")
+public class Ircgroup {
 	public String ip = "";
     public String backupnick = "";
-    public String channel = "";
-    public String password = "";
     public Integer port = 6697;
-    @ConfigEntry.Gui.RequiresRestart()
     public boolean autoconnect;
-    @ConfigEntry.Gui.Excluded()
     public IrcVerbosity verbosity = IrcVerbosity.NORMAL;
+    public List<String> postConnectionCommands = new ArrayList<String>();
+
 }
