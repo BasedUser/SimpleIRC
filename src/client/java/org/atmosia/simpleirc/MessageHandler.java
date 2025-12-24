@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class MessageHandler {
     public static Map<String, HashMap<String, IRCUserModes>> StatusPrefixes = new HashMap<>();
+    private static Boolean RefreshNamesFlag = false;
     public static void HandleMessage(String message) {
         // :baseduser.eu.org NOTICE * :*** Looking up your hostname...
         // :FJSAGS_Web!FJSAGS@SomeIpInfo PRIVMSG #ss15 :i need this for testing and understanding of IRC protocol...
@@ -51,13 +52,19 @@ public class MessageHandler {
     }
     private static void HandleCommand(String source, String command, String channel, String content) {
         if (command.equals("NOTICE"))
-            ChatUtils.IRCMessageTemplates.Notice(source, channel, content.replaceFirst(":", ""));
+        {
+            ChatUtils.IRCMessageTemplates.Notice(source.split("!")[0], channel, content.replaceFirst(":", ""));
+        }
         else if (command.equals("PRIVMSG")) {
-            ChatUtils.IRCMessageTemplates.Message(source, channel, content.replaceFirst(":", ""));
+            ChatUtils.IRCMessageTemplates.Message(source.split("!")[0], channel, content.replaceFirst(":", ""));
+
         }
         else if (command.equals("JOIN")) {
             // FJSAGS_Web!FJSAGS@Ip JOIN :#ss15-pub
             ChatUtils.IRCMessageTemplates.Join(source.split("!")[0], channel.substring(channel.indexOf(':') + 1));
+            if (source.split("!")[0].equals(MainClient.irc.nickname())) {
+                MainClient.irc.AddChannel(new IRCChannel(channel.substring(channel.indexOf(':') + 1), "", false), false);
+            }
         }
         else if (command.equals("PART")) {
             // Source =  FJSAGS_Web!FJSAGS@Ip
@@ -80,6 +87,10 @@ public class MessageHandler {
                 entry.putIfAbsent(source.split("!")[0], mode);
             }
             ChatUtils.Notify(source.split("!")[0] + " nickname is now " + channel.substring(channel.indexOf(':') + 1));
+        }
+        else if (command.equals("MODE")) {
+            RefreshNamesFlag = true;
+            MainClient.irc.SendLine("NAMES " + channel); // yeah. dont ask
         }
     }
     private static void HandleNumeric(String source, Integer numeric, String channel, String content) {
@@ -115,7 +126,10 @@ public class MessageHandler {
             for (String person : people) {
                 formattedPeople.append(GetFormattedUser(person, channel)).append(" ");
             }
-            ChatUtils.Verbose(message + formattedPeople);
+            if (!RefreshNamesFlag){
+                ChatUtils.Verbose(message + formattedPeople);
+            }
+            RefreshNamesFlag = false;
         }
         else if (numeric == 332) {
             // [RAW <=] baseduser.eu.org 332 FJSAGS #ss15-pub :Home of the Russian Mafia since 2024-07
@@ -157,6 +171,11 @@ public class MessageHandler {
             ChatUtils.Error("Nickname <blue>" + nicknameInUse + "</blue> is already in use!");
             ChatUtils.Error("Reconnecting using a backup nickname!");
             MainClient.irc.UseBackupNickname();
+        } else if (numeric == 900) {
+            ChatUtils.IRCMessageTemplates.Notice(source, channel, "You are now authenticated.");
+        }
+        else if (numeric == 903) {
+            MainClient.irc.SendLine("CAP END");
         }
     }
 
@@ -164,6 +183,7 @@ public class MessageHandler {
         var statusesForChannel = new HashMap<String, IRCUserModes>();
 
         for (String person : people) {
+            person = person.split("!")[0];
             if (person.startsWith("~")) {
                 statusesForChannel.putIfAbsent(person.substring(1), IRCUserModes.OWNER);
             }

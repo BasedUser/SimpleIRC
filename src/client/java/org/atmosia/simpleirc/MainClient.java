@@ -46,11 +46,10 @@ public class MainClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (JBind.wasPressed()) 
             {
-        		MinecraftClient instance = MinecraftClient.getInstance();
-				ModMenuIntegration integration = new ModMenuIntegration();
-    			Screen configScreen = integration.getModConfigScreenFactory().create(instance.currentScreen);
-        		
-        		instance.setScreen(configScreen);
+        		// MinecraftClient instance = MinecraftClient.getInstance();
+				// ModMenuIntegration integration = new ModMenuIntegration();
+    			// Screen configScreen = integration.getModConfigScreenFactory().create(instance.currentScreen);
+        		// instance.setScreen(configScreen);
             }
             
             while(KBind.wasPressed())
@@ -68,8 +67,8 @@ public class MainClient implements ClientModInitializer {
         SimpleIrcCommand.Register();
 	}
     public static void Connect() {
-        MainClient.irc = new IRCNetwork(Main.getSettings().ip, Main.getSettings().port, ChatUtils.getUsername(),
-                Main.getSettings().backupnick, Main.getSettings().verbosity);
+        MainClient.irc = new IRCNetwork(Main.settings.ip(), Main.settings.port(), ChatUtils.getUsername(),
+                Main.settings.backupnick(), Main.settings.verbosity());
         try {
             MainClient.irc.Connect();
         } catch (IllegalStateException e) {

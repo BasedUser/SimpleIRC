@@ -1,7 +1,5 @@
 package org.atmosia.simpleirc;
 
-import com.typesafe.config.Optional;
-
 public class IRCChannel {
     public String Name;
     public String Password;
@@ -14,7 +12,7 @@ public class IRCChannel {
             return "JOIN " + Name;
         }
     }
-    public String Part(@Optional String reason) {
+    public String Part(String reason) {
         if (!reason.isEmpty()) {
             return "PART " + Name + " " + reason;
         }
