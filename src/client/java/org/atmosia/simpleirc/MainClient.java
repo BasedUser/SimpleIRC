@@ -17,13 +17,6 @@ public class MainClient implements ClientModInitializer {
 	public static IRCNetwork irc = null;
     public static Boolean DefaultToMinecraftChat = false;
     public static Character MinecraftChatPrefix = '!';
-
-    private static KeyBinding JBind = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-    	    "key.simpleirc.config", // The translation key of the keybinding's name
-    	    InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-    	    GLFW.GLFW_KEY_J, // The keycode of the key
-    	    "category.simpleirc.main" // The translation key of the keybinding's category.
-    	));
 	
 	private static KeyBinding KBind = KeyBindingHelper.registerKeyBinding(new KeyBinding(
     	    "key.simpleirc.toggleconnect", // translation key
@@ -44,14 +37,6 @@ public class MainClient implements ClientModInitializer {
               
         
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (JBind.wasPressed()) 
-            {
-        		// MinecraftClient instance = MinecraftClient.getInstance();
-				// ModMenuIntegration integration = new ModMenuIntegration();
-    			// Screen configScreen = integration.getModConfigScreenFactory().create(instance.currentScreen);
-        		// instance.setScreen(configScreen);
-            }
-            
             while(KBind.wasPressed())
             {
             	if(irc==null || !irc.isConnected())

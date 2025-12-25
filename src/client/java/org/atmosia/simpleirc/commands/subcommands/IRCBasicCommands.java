@@ -53,7 +53,7 @@ public class IRCBasicCommands {
         var arguments = context.getArgument("[channel] [password (optional)]", String.class);
         var splits = arguments.split(" ");
         var channel = splits[0].trim();
-        var password = splits[1].length() > 1 ? splits[1] : "";
+        var password = splits.length > 1 ? splits[1] : "";
         MainClient.irc.AddChannel(new IRCChannel(channel, password, false), true);
         return 0;
     }

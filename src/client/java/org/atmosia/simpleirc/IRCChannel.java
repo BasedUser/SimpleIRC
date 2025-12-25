@@ -4,6 +4,7 @@ public class IRCChannel {
     public String Name;
     public String Password;
     public Boolean AutoConnectFlag;
+    public Character Prefix;
     public String Join() {
         if (!Password.isEmpty()) {
             return "JOIN " + Name + " " + Password;

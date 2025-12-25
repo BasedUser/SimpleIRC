@@ -92,6 +92,10 @@ public class MessageHandler {
             RefreshNamesFlag = true;
             MainClient.irc.SendLine("NAMES " + channel); // yeah. dont ask
         }
+        else if (command.equals("QUIT")) {
+            // [02:32:39] :FJSAGS_Web!FJSAGS@Ip QUIT :Quit: bye-bye six seven
+            ChatUtils.IRCMessageTemplates.Quit(source.split("!")[0], content);
+        }
     }
     private static void HandleNumeric(String source, Integer numeric, String channel, String content) {
         var contentInParts = content.split(" ");

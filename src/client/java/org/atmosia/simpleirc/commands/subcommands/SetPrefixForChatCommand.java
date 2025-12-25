@@ -14,7 +14,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 
 public class SetPrefixForChatCommand {
     public static LiteralArgumentBuilder<FabricClientCommandSource> Register(LiteralArgumentBuilder<FabricClientCommandSource> command) {
-        command.then(ClientCommandManager.literal("setchannelprefix")
+        command.then(ClientCommandManager.literal("channelprefix")
                 .then(argument("[channel] [prefix]", StringArgumentType.greedyString())
                         .suggests(new ConnectedChannelsAndMcSuggester())
                                 .executes(SetPrefixForChatCommand::SetPrefix)))

@@ -10,5 +10,4 @@
   "text.config.simple-irc.option.verbosity.value.quiet": "QUIET",
   "text.config.simple-irc.option.verbosity.value.raw": "RAW",
   "text.config.simple-irc.option.verbosity.value.debug": "DEBUG"
-
 }

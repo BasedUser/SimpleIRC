@@ -38,10 +38,11 @@
     "fabricloader": "*",
     "fabric-api": "*",
     "minecraft": "*",
-    "java": ">=17"
+    "java": ">=17",
+    "owo-lib": ">=0.12.23+1.21.8"
+
   },
   "suggests": {
-    "another-mod": "cloth-config",
 	"minecraft": "1.21.8"
   }
 }

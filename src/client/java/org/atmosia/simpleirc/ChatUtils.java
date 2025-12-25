@@ -113,6 +113,9 @@ public enum ChatUtils{
             Component parsedMsg = mm.deserialize("<blue>" + channel + "</blue> | <red>-</red> " + MessageHandler.GetFormattedUser(source, channel));
             message(parsedMsg);
         }
-
+        public static void Quit(String person, String content) {
+            Component parsedMsg = mm.deserialize("<red>" + person + "</red> | <gold>Quitting: " + content + "</gold> ");
+            message(parsedMsg);
+        }
     }
 }

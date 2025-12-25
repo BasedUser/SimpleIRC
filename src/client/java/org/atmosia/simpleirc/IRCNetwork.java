@@ -25,7 +25,6 @@ public class IRCNetwork {
     private SSLSocket Socket;
     private BufferedReader Reader;
     private BufferedWriter Writer;
-    private static HashMap<Character, String> characterStringHashMap = new HashMap<>();
     private final AtomicBoolean initialConnectionFinished;
     private final AtomicBoolean registeredSasl;
     public Boolean IsAway;
@@ -266,6 +265,8 @@ public class IRCNetwork {
         PrimaryChannel = channel;
     }
     public String GetPrimaryChannel() {
+        if (MainClient.DefaultToMinecraftChat) return "#minecraft_chat";
+
         return PrimaryChannel;
     }
     public void Disconnect(String reason) {
@@ -297,13 +298,14 @@ public class IRCNetwork {
         return Channels.stream().filter(x -> Objects.equals(x.Name, channelName) || Objects.equals(x.Name.substring(1), channelName)).findFirst().orElse(null);
     }
     public IRCChannel GetChannelByPrefix(Character prefix) {
-        return GetChannel(characterStringHashMap.get(prefix));
+        return Channels.stream().filter(x -> Objects.equals(x.Prefix, prefix)).findFirst().orElse(null);
     }
     public void AddChannelByPrefix(Character prefix, IRCChannel channel) {
+        channel.Prefix = prefix;
         if (Channels.stream().noneMatch(x -> Objects.equals(x.Name, channel.Name))) {
             AddChannel(channel, true);
         }
-        characterStringHashMap.putIfAbsent(prefix, channel.Name);
+
     }
     public void UseBackupNickname() {
         SendLine("NICK " + BackupNickname);

@@ -35,10 +35,9 @@ public abstract class ChatManager {
             info.cancel();
         }
         if (skipIrcStuff) {
-            Main.LOGGER.info("Sent message to normal chat, since one condition isn't satisfied");
+            // skip
         }
         else {
-            Main.LOGGER.info("Sending message to IRC chat");
             var channel = MainClient.irc.GetChannelByPrefix(message.charAt(0));
             if (channel != null) {
                 String text = message.substring(1);
